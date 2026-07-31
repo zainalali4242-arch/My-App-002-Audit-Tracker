@@ -133,9 +133,9 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
 .radio-group{display:flex;gap:.4rem;flex-wrap:wrap}
 .radio-opt{padding:.35rem .85rem;border:1px solid var(--border2);border-radius:20px;font-size:.8rem;cursor:pointer;transition:.12s;color:var(--text2)}
 .radio-opt.selected{border-color:var(--purple);background:var(--purple-bg);color:var(--purple-text);font-weight:500}
-.modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:500;display:none;align-items:flex-end;justify-content:center}
+.modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:500;display:none;align-items:flex-end}
 .modal-backdrop.open{display:flex}
-.modal-sheet{background:var(--surface);border-radius:var(--radius) var(--radius) 0 0;width:100%;max-width:680px;max-height:93vh;overflow-y:auto;padding:1.1rem}
+.modal-sheet{background:var(--surface);border-radius:var(--radius) var(--radius) 0 0;position:relative;left:0;right:0;width:100%;max-height:93vh;overflow-y:auto;padding:1.1rem 1rem 1.5rem;box-sizing:border-box}
 .modal-handle{width:36px;height:4px;background:var(--border2);border-radius:2px;margin:0 auto .7rem}
 .modal-title{font-size:.98rem;font-weight:600;margin-bottom:.9rem}
 .modal-footer{display:flex;gap:.55rem;margin-top:.9rem;padding-top:.7rem;border-top:1px solid var(--border)}
@@ -193,7 +193,15 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
 .onboard-btns{display:flex;gap:.5rem;justify-content:flex-end}
 
 /* ── MOBILE OPTIMISASI ── */
+@media(max-width:380px){
+  .ekspor-grid{grid-template-columns:1fr!important}
+  .ekspor-card{flex-direction:row;text-align:left;padding:.55rem .65rem;gap:.5rem}
+  .ekspor-card-ico{font-size:1.2rem;flex-shrink:0}
+  .ekspor-card-title{font-size:.78rem}
+  .ekspor-card-sub{display:none}
+}
 @media(max-width:480px){
+  .modal-sheet{border-radius:12px 12px 0 0;padding:1rem .85rem}
   .form-row{grid-template-columns:1fr}
   .kpi-grid{grid-template-columns:repeat(2,1fr)}
   .detail-grid{grid-template-columns:1fr}
@@ -216,7 +224,7 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
 .offline-banner{position:fixed;top:0;left:0;right:0;background:#A32D2D;color:#fff;text-align:center;font-size:.78rem;padding:.4rem;z-index:9998;display:none;align-items:center;justify-content:center;gap:.5rem}
 .offline-banner.show{display:flex}
 /* ── QUICK CAPTURE SHEET ── */
-.qc-sheet{position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-radius:var(--radius) var(--radius) 0 0;z-index:600;transform:translateY(100%);transition:transform .28s cubic-bezier(.25,.46,.45,.94);max-height:85vh;overflow-y:auto;padding:1rem;max-width:680px;margin:0 auto}
+.qc-sheet{position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-radius:var(--radius) var(--radius) 0 0;z-index:600;transform:translateY(100%);transition:transform .28s cubic-bezier(.25,.46,.45,.94);max-height:90vh;overflow-y:auto;padding:1rem 1rem 1.5rem;box-sizing:border-box}
 .qc-sheet.open{transform:translateY(0)}
 .qc-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:599;display:none}
 .qc-backdrop.open{display:block}
@@ -293,14 +301,20 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
 .foto-counter{font-size:.72rem;color:rgba(255,255,255,.6)}
 
 /* ── EKSPOR MODAL MOBILE ── */
-.ekspor-grid{display:grid;grid-template-columns:1fr 1fr;gap:.55rem;margin-bottom:.75rem}
-.ekspor-card{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:.75rem;cursor:pointer;transition:.1s;text-align:center;display:flex;flex-direction:column;align-items:center;gap:.3rem}
+.ekspor-grid{display:grid;grid-template-columns:1fr 1fr;gap:.45rem;margin-bottom:.65rem}
+.ekspor-card{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:.6rem .4rem;cursor:pointer;transition:.1s;text-align:center;display:flex;flex-direction:column;align-items:center;gap:.2rem;min-width:0}
+.ekspor-row-btn{display:flex;align-items:center;gap:.65rem;width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:.6rem .75rem;cursor:pointer;text-align:left;transition:.1s;-webkit-tap-highlight-color:transparent}
+.ekspor-row-btn:active{background:var(--surface)}
+.ekspor-row-ico{font-size:1.3rem;line-height:1;flex-shrink:0;width:1.6rem;text-align:center}
+.ekspor-row-info{display:flex;flex-direction:column;gap:1px;flex:1;min-width:0}
+.ekspor-row-info b{font-size:.83rem;font-weight:600;color:var(--text);display:block}
+.ekspor-row-info small{font-size:.72rem;color:var(--text3);display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .ekspor-card:active{background:var(--surface);transform:scale(.97)}
-.ekspor-card-ico{font-size:1.6rem;line-height:1}
-.ekspor-card-title{font-size:.8rem;font-weight:600;color:var(--text);line-height:1.3}
-.ekspor-card-sub{font-size:.68rem;color:var(--text3);line-height:1.4}
+.ekspor-card-ico{font-size:1.4rem;line-height:1}
+.ekspor-card-title{font-size:.75rem;font-weight:600;color:var(--text);line-height:1.25;word-break:break-word}
+.ekspor-card-sub{font-size:.62rem;color:var(--text3);line-height:1.35;word-break:break-word}
 .ekspor-card-badge{font-size:.62rem;padding:1px 6px;border-radius:10px;margin-top:.15rem}
-.ekspor-section-title{font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);margin-bottom:.4rem;margin-top:.1rem}
+.ekspor-section-title{font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--text3);margin-bottom:.35rem;margin-top:.1rem}
 .sample-tag{display:inline-block;padding:1px 6px;border-radius:10px;font-size:.65rem;background:var(--blue-bg);color:var(--blue-text);margin-left:.3rem;vertical-align:middle}
 .stat-screen-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:.6rem;margin-bottom:.85rem}
 .stat-lini-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:.85rem}
@@ -890,7 +904,7 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
 <div class="modal-backdrop" id="modal-export" onclick="closeBg(event,'modal-export')">
   <div class="modal-sheet">
     <div class="modal-handle"></div>
-    <div class="modal-title">Ekspor &amp; Laporan</div>
+    <div style="font-size:.95rem;font-weight:600;margin-bottom:.65rem">Ekspor &amp; Laporan</div>
     <div class="ekspor-section-title">&#128196; Laporan resmi</div>
     <div class="ekspor-grid">
       <div class="ekspor-card" onclick="printReportExec()">
@@ -926,7 +940,7 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
       <div class="list-item" onclick="exportJSON()"><div class="list-row"><div class="list-title">Backup JSON</div><span class="badge badge-neutral">Direkomendasikan</span></div><div class="list-meta"><span class="list-date">Simpan seluruh data untuk restore ke perangkat lain.</span></div></div>
       <div class="list-item" onclick="exportCSV()"><div class="list-row"><div class="list-title">Ekspor temuan ke CSV</div><span class="badge badge-neutral">Excel</span></div><div class="list-meta"><span class="list-date">Daftar temuan dalam format spreadsheet.</span></div></div>
     </div>
-    <div class="modal-footer"><button class="btn-sm" onclick="closeM('modal-export')" style="width:100%">Tutup</button></div>
+    <div style="margin-top:.6rem"><button class="btn-sm" onclick="closeM('modal-export')" style="width:100%;height:40px;font-size:.88rem">Tutup</button></div>
   </div>
 </div>
 <div class="modal-backdrop" id="modal-import" onclick="closeBg(event,'modal-import')">
