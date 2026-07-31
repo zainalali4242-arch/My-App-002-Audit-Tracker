@@ -133,9 +133,9 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
 .radio-group{display:flex;gap:.4rem;flex-wrap:wrap}
 .radio-opt{padding:.35rem .85rem;border:1px solid var(--border2);border-radius:20px;font-size:.8rem;cursor:pointer;transition:.12s;color:var(--text2)}
 .radio-opt.selected{border-color:var(--purple);background:var(--purple-bg);color:var(--purple-text);font-weight:500}
-.modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:500;display:none;align-items:flex-end}
+.modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:500;display:none;align-items:flex-end;overflow:hidden}
 .modal-backdrop.open{display:flex}
-.modal-sheet{background:var(--surface);border-radius:var(--radius) var(--radius) 0 0;position:relative;left:0;right:0;width:100%;max-height:93vh;overflow-y:auto;padding:1.1rem 1rem 1.5rem;box-sizing:border-box}
+.modal-sheet{background:var(--surface);border-radius:var(--radius) var(--radius) 0 0;width:100%;max-width:680px;margin-left:auto;margin-right:auto;max-height:93vh;overflow-y:auto;padding:1rem 1rem 1.5rem;box-sizing:border-box}
 .modal-handle{width:36px;height:4px;background:var(--border2);border-radius:2px;margin:0 auto .7rem}
 .modal-title{font-size:.98rem;font-weight:600;margin-bottom:.9rem}
 .modal-footer{display:flex;gap:.55rem;margin-top:.9rem;padding-top:.7rem;border-top:1px solid var(--border)}
@@ -303,12 +303,16 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
 /* ── EKSPOR MODAL MOBILE ── */
 .ekspor-grid{display:grid;grid-template-columns:1fr 1fr;gap:.45rem;margin-bottom:.65rem}
 .ekspor-card{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:.6rem .4rem;cursor:pointer;transition:.1s;text-align:center;display:flex;flex-direction:column;align-items:center;gap:.2rem;min-width:0}
-.ekspor-row-btn{display:flex;align-items:center;gap:.65rem;width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:.6rem .75rem;cursor:pointer;text-align:left;transition:.1s;-webkit-tap-highlight-color:transparent}
-.ekspor-row-btn:active{background:var(--surface)}
-.ekspor-row-ico{font-size:1.3rem;line-height:1;flex-shrink:0;width:1.6rem;text-align:center}
-.ekspor-row-info{display:flex;flex-direction:column;gap:1px;flex:1;min-width:0}
-.ekspor-row-info b{font-size:.83rem;font-weight:600;color:var(--text);display:block}
-.ekspor-row-info small{font-size:.72rem;color:var(--text3);display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* ── EXPORT MODAL ROWS ── */
+.em-section-lbl{font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--text3);margin-bottom:.3rem;margin-top:.65rem}
+.em-list{display:flex;flex-direction:column;gap:.35rem}
+.em-row{display:flex;align-items:center;gap:.7rem;width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:.65rem .8rem;cursor:pointer;text-align:left;-webkit-tap-highlight-color:transparent;transition:.12s;min-height:52px}
+.em-row:active{background:var(--surface);transform:scale(.99)}
+.em-ico{font-size:1.25rem;line-height:1;flex-shrink:0;width:1.5rem;text-align:center}
+.em-body{display:flex;flex-direction:column;gap:2px;flex:1;min-width:0}
+.em-title{font-size:.85rem;font-weight:600;color:var(--text);display:block}
+.em-desc{font-size:.73rem;color:var(--text3);display:block;line-height:1.3}
+.em-badge{flex-shrink:0;font-size:.63rem!important;padding:2px 6px!important}
 .ekspor-card:active{background:var(--surface);transform:scale(.97)}
 .ekspor-card-ico{font-size:1.4rem;line-height:1}
 .ekspor-card-title{font-size:.75rem;font-weight:600;color:var(--text);line-height:1.25;word-break:break-word}
@@ -904,45 +908,88 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
 <div class="modal-backdrop" id="modal-export" onclick="closeBg(event,'modal-export')">
   <div class="modal-sheet">
     <div class="modal-handle"></div>
-    <div style="font-size:.95rem;font-weight:600;margin-bottom:.65rem">Ekspor &amp; Laporan</div>
-    <div class="ekspor-section-title">&#128196; Laporan resmi</div>
-    <div class="ekspor-grid">
-      <div class="ekspor-card" onclick="printReportExec()">
-        <div class="ekspor-card-ico">&#127775;</div>
-        <div class="ekspor-card-title">Laporan Eksekutif</div>
-        <div class="ekspor-card-sub">Executive summary · 1 halaman</div>
-        <span class="ekspor-card-badge badge badge-conf">Direksi</span>
-      </div>
-      <div class="ekspor-card" onclick="printReport()">
-        <div class="ekspor-card-ico">&#128203;</div>
-        <div class="ekspor-card-title">Laporan Lengkap</div>
-        <div class="ekspor-card-sub">Detail semua temuan + foto</div>
-        <span class="ekspor-card-badge badge badge-neutral">Kepala Audit</span>
-      </div>
-      <div class="ekspor-card" onclick="showRekonModal()">
-        <div class="ekspor-card-ico">&#9989;</div>
-        <div class="ekspor-card-title">Rekonsiliasi PIC</div>
-        <div class="ekspor-card-sub">Filter per PIC · Tanda tangan</div>
-        <span class="ekspor-card-badge badge badge-closed">PIC Divisi</span>
-      </div>
+    <div style="font-size:.95rem;font-weight:600;margin-bottom:.85rem">Ekspor &amp; Laporan</div>
+
+    <div class="em-section-lbl">&#128196; Laporan resmi</div>
+    <div class="em-list">
+      <button class="em-row" onclick="printReportExec()">
+        <span class="em-ico">&#127775;</span>
+        <span class="em-body">
+          <span class="em-title">Laporan Eksekutif</span>
+          <span class="em-desc">Executive summary &middot; untuk Direksi / Owner</span>
+        </span>
+        <span class="badge badge-conf em-badge">Direksi</span>
+      </button>
+      <button class="em-row" onclick="printReport()">
+        <span class="em-ico">&#128203;</span>
+        <span class="em-body">
+          <span class="em-title">Laporan Lengkap</span>
+          <span class="em-desc">Detail semua temuan &middot; foto &middot; Kepala Audit</span>
+        </span>
+        <span class="badge badge-neutral em-badge">Audit</span>
+      </button>
+      <button class="em-row" onclick="showRekonModal()">
+        <span class="em-ico">&#9989;</span>
+        <span class="em-body">
+          <span class="em-title">Rekonsiliasi PIC</span>
+          <span class="em-desc">Filter per PIC &middot; kolom tanda tangan</span>
+        </span>
+        <span class="badge badge-closed em-badge">PIC</span>
+      </button>
+      <button class="em-row" onclick="openBatchWP()">
+        <span class="em-ico">&#128241;</span>
+        <span class="em-body">
+          <span class="em-title">Batch Working Paper</span>
+          <span class="em-desc">Cetak banyak working paper sekaligus</span>
+        </span>
+        <span class="badge badge-neutral em-badge">Multi</span>
+      </button>
     </div>
-    <div class="list-item" onclick="openBatchWP()">
-        <div class="list-row"><div class="list-title">&#128203; Batch Working Paper</div><span class="badge badge-neutral">Multi cetak</span></div>
-        <div class="list-meta"><span class="list-date">Pilih beberapa temuan sekaligus dan cetak semua working paper dalam satu dokumen.</span></div>
-      </div>
-      <div class="list-item" onclick="closeM('modal-export');openModal('modal-email');genEmail()">
-        <div class="list-row"><div class="list-title">&#128172; Ringkasan siap kirim</div><span class="badge badge-neutral">WA / Email</span></div>
-        <div class="list-meta"><span class="list-date">Teks ringkasan status audit siap dikopi ke email atau chat WhatsApp.</span></div>
-      </div>
+
+    <div class="em-section-lbl">&#128172; Kirim &amp; tools</div>
+    <div class="em-list">
+      <button class="em-row" onclick="closeM('modal-export');openModal('modal-email');genEmail()">
+        <span class="em-ico">&#128172;</span>
+        <span class="em-body">
+          <span class="em-title">Ringkasan siap kirim</span>
+          <span class="em-desc">Teks WA / email ke atasan &mdash; 1 klik salin</span>
+        </span>
+        <span class="badge badge-neutral em-badge">WA</span>
+      </button>
+      <button class="em-row" onclick="goTo('laporan');closeM('modal-export')">
+        <span class="em-ico">&#128204;</span>
+        <span class="em-body">
+          <span class="em-title">Daftar Laporan</span>
+          <span class="em-desc">Registry &amp; nomor laporan resmi</span>
+        </span>
+        <span class="badge badge-neutral em-badge">Log</span>
+      </button>
     </div>
-    <div style="font-size:.7rem;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--text3);margin-bottom:.4rem">Data &amp; backup</div>
-    <div style="display:flex;flex-direction:column;gap:.45rem">
-      <div class="list-item" onclick="exportJSON()"><div class="list-row"><div class="list-title">Backup JSON</div><span class="badge badge-neutral">Direkomendasikan</span></div><div class="list-meta"><span class="list-date">Simpan seluruh data untuk restore ke perangkat lain.</span></div></div>
-      <div class="list-item" onclick="exportCSV()"><div class="list-row"><div class="list-title">Ekspor temuan ke CSV</div><span class="badge badge-neutral">Excel</span></div><div class="list-meta"><span class="list-date">Daftar temuan dalam format spreadsheet.</span></div></div>
+
+    <div class="em-section-lbl">&#128190; Backup data</div>
+    <div class="em-list" style="margin-bottom:1rem">
+      <button class="em-row" onclick="exportJSON()">
+        <span class="em-ico">&#128190;</span>
+        <span class="em-body">
+          <span class="em-title">Backup JSON</span>
+          <span class="em-desc">Simpan semua data termasuk foto &mdash; lakukan rutin</span>
+        </span>
+        <span class="badge em-badge" style="background:var(--green-bg);color:var(--green-text)">Rutin</span>
+      </button>
+      <button class="em-row" onclick="exportCSV()">
+        <span class="em-ico">&#128202;</span>
+        <span class="em-body">
+          <span class="em-title">Ekspor CSV</span>
+          <span class="em-desc">Daftar temuan ke format spreadsheet Excel</span>
+        </span>
+        <span class="badge badge-neutral em-badge">Excel</span>
+      </button>
     </div>
-    <div style="margin-top:.6rem"><button class="btn-sm" onclick="closeM('modal-export')" style="width:100%;height:40px;font-size:.88rem">Tutup</button></div>
+
+    <button class="btn-sm" onclick="closeM('modal-export')" style="width:100%;height:44px;font-size:.9rem">Tutup</button>
   </div>
 </div>
+
 <div class="modal-backdrop" id="modal-import" onclick="closeBg(event,'modal-import')">
   <div class="modal-sheet">
     <div class="modal-handle"></div>
