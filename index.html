@@ -385,16 +385,18 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
     <textarea id="qc-kondisi" rows="3" placeholder="Apa yang kamu lihat di lapangan?"></textarea>
   </div>
   <div class="form-group">
-    <label class="form-label">Foto bukti (opsional — bisa pilih banyak)</label>
-    <label class="foto-add-btn" for="qc-photo" style="width:100%;aspect-ratio:auto;flex-direction:row;padding:.5rem .85rem;justify-content:flex-start;gap:.5rem">
-      <span>&#128247;</span>
-      <div style="text-align:left">
-        <div style="font-size:.82rem;font-weight:500;color:var(--text2)">Ambil foto atau pilih dari galeri</div>
-        <div style="font-size:.7rem;color:var(--text3)">Bisa pilih beberapa sekaligus</div>
-      </div>
-    </label>
-    <input type="file" id="qc-photo" accept="image/*" multiple style="display:none" onchange="addFotoQC(this)">
-    <div class="foto-grid" id="qc-foto-grid" style="margin-top:.5rem"></div>
+    <label class="form-label">Foto bukti (opsional)</label>
+    <div style="display:flex;gap:.5rem;margin-bottom:.5rem">
+      <label for="qc-kamera" style="flex:1;display:flex;align-items:center;justify-content:center;gap:.4rem;padding:.65rem;background:var(--purple);color:#fff;border-radius:var(--radius-sm);cursor:pointer;font-size:.85rem;font-weight:500;min-height:44px">
+        &#128247; Kamera
+      </label>
+      <label for="qc-galeri" style="flex:1;display:flex;align-items:center;justify-content:center;gap:.4rem;padding:.65rem;background:var(--surface2);color:var(--text2);border:1px solid var(--border2);border-radius:var(--radius-sm);cursor:pointer;font-size:.85rem;font-weight:500;min-height:44px">
+        &#128444; Galeri
+      </label>
+    </div>
+    <input type="file" id="qc-kamera" accept="image/*" capture="environment" style="display:none" onchange="addFotoQC(this)">
+    <input type="file" id="qc-galeri" accept="image/*" multiple style="display:none" onchange="addFotoQC(this)">
+    <div class="foto-grid" id="qc-foto-grid"></div>
   </div>
   <div style="display:flex;gap:.5rem;margin-top:.75rem;padding-bottom:.5rem">
     <button class="btn-sm" onclick="closeQC()" style="flex:1">Batal</button>
@@ -656,12 +658,17 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
     <div class="form-group"><label class="form-label">Rekomendasi<span>*</span></label><textarea id="t-rekom" placeholder="Langkah perbaikan yang spesifik"></textarea></div>
     <div class="form-section">Foto bukti</div>
     <div class="form-group">
-      <label class="form-label">Foto / bukti visual (bisa pilih banyak)</label>
-      <label class="foto-add-btn" for="t-foto-input" style="width:100%;aspect-ratio:auto;flex-direction:row;padding:.5rem .85rem;justify-content:flex-start;gap:.5rem">
-        <span>&#128247;</span>
-        <div style="text-align:left"><div style="font-size:.82rem;font-weight:500;color:var(--text2)">Ambil foto atau pilih dari galeri</div><div style="font-size:.7rem;color:var(--text3)">Bisa pilih beberapa sekaligus</div></div>
-      </label>
-      <input type="file" id="t-foto-input" accept="image/*" multiple style="display:none" onchange="addFotoTemuan(this)">
+      <label class="form-label">Foto / bukti visual (opsional)</label>
+      <div style="display:flex;gap:.5rem;margin-bottom:.5rem">
+        <label for="t-foto-kamera" style="flex:1;display:flex;align-items:center;justify-content:center;gap:.4rem;padding:.65rem;background:var(--purple);color:#fff;border-radius:var(--radius-sm);cursor:pointer;font-size:.85rem;font-weight:500;min-height:44px">
+          &#128247; Kamera
+        </label>
+        <label for="t-foto-galeri" style="flex:1;display:flex;align-items:center;justify-content:center;gap:.4rem;padding:.65rem;background:var(--surface2);color:var(--text2);border:1px solid var(--border2);border-radius:var(--radius-sm);cursor:pointer;font-size:.85rem;font-weight:500;min-height:44px">
+          &#128444; Galeri
+        </label>
+      </div>
+      <input type="file" id="t-foto-kamera" accept="image/*" capture="environment" style="display:none" onchange="addFotoTemuan(this)">
+      <input type="file" id="t-foto-galeri" accept="image/*" multiple style="display:none" onchange="addFotoTemuan(this)">
       <div class="foto-grid" id="t-foto-grid"></div>
     </div>
     <div class="form-section">Tindak lanjut</div>
@@ -1727,7 +1734,7 @@ function closeQC(){
   if(bd)bd.classList.remove('open');if(sh)sh.classList.remove('open');
   ['qc-judul','qc-kondisi'].forEach(id=>{const el=document.getElementById(id);if(el)el.value=''});
   const qs=document.getElementById('qc-kategori');if(qs)qs.selectedIndex=0;
-  const qp=document.getElementById('qc-photo');if(qp)qp.value='';
+  ['qc-kamera','qc-galeri'].forEach(id=>{const el=document.getElementById(id);if(el)el.value=''});
   document.querySelectorAll('#qc-rating .radio-opt').forEach(o=>o.classList.remove('selected'));
   _qcFotos=[];
   const grid=document.getElementById('qc-foto-grid');if(grid)grid.innerHTML='';
