@@ -449,6 +449,12 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
       <div id="recent-temuan"></div>
       <div class="sec-hdr" style="margin-top:.75rem"><span class="sec-title">Follow-up mendekati deadline</span><button class="btn-sm" onclick="goTo('temuan')">Lihat semua</button></div>
       <div id="recent-fu"></div>
+
+      <div class="sec-hdr" style="margin-top:.85rem">
+        <span class="sec-title">Risk Register</span>
+        <button class="btn-sm btn-primary" onclick="goTo('risk')">Kelola</button>
+      </div>
+      <div id="dash-risk-preview"></div>
     </div>
     <div class="screen" id="screen-statistik">
       <div class="sec-hdr" style="margin-bottom:.85rem"><span class="sec-title">Statistik per lini bisnis</span></div>
@@ -589,7 +595,7 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
   </main>
   <nav class="bottom-nav" style="grid-template-columns:repeat(5,1fr)">
     <button class="nav-item active" onclick="goTo('dashboard')" id="nav-dashboard"><span class="nav-ico">&#8862;</span><span>Dasbor</span></button>
-    <button class="nav-item" onclick="goTo('plan')" id="nav-plan"><span class="nav-ico">&#128197;</span><span>Plan</span></button>
+    <button class="nav-item" onclick="goTo('risk')" id="nav-risk"><span class="nav-ico">&#9672;</span><span>Risk</span></button>
     <button class="nav-item" onclick="goTo('penugasan')" id="nav-penugasan"><span class="nav-ico">&#9719;</span><span>Penugasan</span></button>
     <button class="nav-item" onclick="goTo('temuan')" id="nav-temuan"><span class="nav-ico">&#9673;</span><span>Temuan</span></button>
     <button class="nav-item" onclick="goTo('laporan')" id="nav-laporan"><span class="nav-ico">&#128196;</span><span>Laporan</span></button>
@@ -1484,7 +1490,7 @@ function renderLog(){
 // ══════════════════════════════════════════════
 // DASHBOARD
 // ══════════════════════════════════════════════
-function rDash(){rKPI();rAlerts();rRepeat();rCharts();rRecentTemuan();rRecentFU();renderOfflineDash()}
+function rDash(){rKPI();rAlerts();rRepeat();rCharts();rRecentTemuan();rRecentFU();renderOfflineDash();renderDashRisk()}
 function rKPI(){
   const tot=DB.penugasans.length,sel=DB.penugasans.filter(p=>p.status==='Selesai').length,real=tot?Math.round(sel/tot*100):0;
   const tTot=DB.temuan.length,tCl=DB.temuan.filter(t=>t.status==='Closed').length,tClP=tTot?Math.round(tCl/tTot*100):0;
@@ -1505,7 +1511,7 @@ function rAlerts(){
   if(ov.length)alerts.push({tp:'danger',msg:`${ov.length} temuan melewati deadline.`});
   const s7=DB.temuan.filter(t=>{if(!t.deadline||t.status==='Closed')return false;return Math.ceil((new Date(t.deadline)-new Date())/86400000)<=7});
   if(s7.length)alerts.push({tp:'warn',msg:`${s7.length} temuan deadline dalam 7 hari ke depan.`});
-  if(!DB.risks.length)alerts.push({tp:'info',msg:'Risk Register masih kosong.'});
+  if(!DB.risks.length)alerts.push({tp:'info',msg:'Risk Register masih kosong. <button onclick="goTo(\'risk\')" style="background:var(--blue);color:#fff;border:none;border-radius:4px;padding:2px 8px;font-size:.75rem;cursor:pointer;margin-left:.4rem">Isi sekarang →</button>'});
   el.innerHTML=alerts.length?alerts.map(x=>`<div class="alert alert-${x.tp}">&#9888; ${x.msg}</div>`).join(''):DB.temuan.length?`<div class="alert alert-ok">&#10003; Semua tindak lanjut dalam batas waktu.</div>`:'';
 }
 function rRepeat(){
@@ -3115,6 +3121,52 @@ function previewPhoto(input){addFotoQC(input)}
 // Expose foto arrays ke window untuk onclick inline
 Object.defineProperty(window,'_fotos',{get:()=>typeof _fotos!=='undefined'?_fotos:[],set:(v)=>{_fotos=v}});
 Object.defineProperty(window,'_qcFotos',{get:()=>typeof _qcFotos!=='undefined'?_qcFotos:[],set:(v)=>{_qcFotos=v}});
+
+// ═══════════════════════════════════════════════
+// DASHBOARD — Risk Register preview
+// ═══════════════════════════════════════════════
+function renderDashRisk(){
+  const el=document.getElementById('dash-risk-preview');
+  if(!el)return;
+  if(!DB.risks.length){
+    el.innerHTML=`<div style="background:var(--blue-bg);border:1px solid var(--blue);border-radius:var(--radius-sm);padding:.75rem 1rem;display:flex;align-items:center;justify-content:space-between;gap:.75rem">
+      <div>
+        <div style="font-size:.85rem;font-weight:500;color:var(--blue-text)">Risk Register belum diisi</div>
+        <div style="font-size:.75rem;color:var(--blue-text);opacity:.8;margin-top:.15rem">Isi dulu sebelum membuat penugasan audit</div>
+      </div>
+      <button class="btn-sm btn-primary" onclick="goTo('risk')" style="flex-shrink:0;white-space:nowrap">+ Isi sekarang</button>
+    </div>`;
+    return;
+  }
+  // Tampilkan ringkasan per level
+  const h=DB.risks.filter(r=>r.level==='High').length;
+  const m=DB.risks.filter(r=>r.level==='Medium').length;
+  const l=DB.risks.filter(r=>r.level==='Low').length;
+  const tot=DB.risks.length;
+  // Top 3 High risk belum ada penugasan
+  const auditedIds=new Set(DB.penugasans.map(p=>p.lini).filter(Boolean));
+  const topRisks=[...DB.risks]
+    .sort((a,b)=>({High:0,Medium:1,Low:2}[a.level]||1)-({High:0,Medium:1,Low:2}[b.level]||1))
+    .slice(0,3);
+  el.innerHTML=`
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:.85rem;margin-bottom:.5rem">
+      <div style="display:flex;gap:.5rem;margin-bottom:.65rem;flex-wrap:wrap">
+        <span style="font-size:.8rem;background:var(--red-bg);color:var(--red-text);padding:3px 9px;border-radius:20px;font-weight:500">${h} High</span>
+        <span style="font-size:.8rem;background:var(--amber-bg);color:var(--amber-text);padding:3px 9px;border-radius:20px;font-weight:500">${m} Medium</span>
+        <span style="font-size:.8rem;background:var(--green-bg);color:var(--green-text);padding:3px 9px;border-radius:20px;font-weight:500">${l} Low</span>
+        <span style="font-size:.78rem;color:var(--text3);padding:3px 0">${tot} area terdaftar</span>
+      </div>
+      ${topRisks.map(r=>{
+        const rC=r.level==='High'?'var(--red-text)':r.level==='Medium'?'var(--amber-text)':'var(--green-text)';
+        const rBg=r.level==='High'?'var(--red-bg)':r.level==='Medium'?'var(--amber-bg)':'var(--green-bg)';
+        return`<div style="display:flex;align-items:center;gap:.6rem;padding:.4rem 0;border-bottom:1px solid var(--border)">
+          <div style="width:8px;height:8px;border-radius:50%;background:${rC};flex-shrink:0"></div>
+          <div style="flex:1;font-size:.83rem;color:var(--text)">${esc(r.nama)}</div>
+          <div style="font-size:.72rem;color:var(--text3)">${esc(r.kategori)}</div>
+        </div>`;
+      }).join('')}
+    </div>`;
+}
 </script>
 </body>
 </html>
