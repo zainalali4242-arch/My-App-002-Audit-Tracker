@@ -58,7 +58,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .top-bar-btn{width:36px;height:36px;border-radius:var(--radius-sm);border:none;background:transparent;color:var(--text2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0}
 .top-bar-btn:active{background:var(--surface2)}
 main{flex:1;padding:.85rem;max-width:680px;margin:0 auto;width:100%;padding-bottom:8rem}
-.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-top:1px solid var(--border);display:grid;grid-template-columns:repeat(4,1fr);height:58px;z-index:100;max-width:680px;margin:0 auto}
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-top:1px solid var(--border);display:grid;grid-template-columns:repeat(5,1fr);height:58px;z-index:450}
 .nav-item{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;border:none;background:transparent;color:var(--text3);font-size:.62rem;cursor:pointer;padding:.35rem}
 .nav-item.active{color:var(--purple)}
 .nav-ico{font-size:1.25rem;line-height:1}
@@ -133,9 +133,9 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
 .radio-group{display:flex;gap:.4rem;flex-wrap:wrap}
 .radio-opt{padding:.35rem .85rem;border:1px solid var(--border2);border-radius:20px;font-size:.8rem;cursor:pointer;transition:.12s;color:var(--text2)}
 .radio-opt.selected{border-color:var(--purple);background:var(--purple-bg);color:var(--purple-text);font-weight:500}
-.modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:500;display:none;align-items:flex-end;overflow:hidden}
+.modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:500;display:none;align-items:flex-end}
 .modal-backdrop.open{display:flex}
-.modal-sheet{background:var(--surface);border-radius:var(--radius) var(--radius) 0 0;width:100%;max-width:680px;margin-left:auto;margin-right:auto;max-height:93vh;overflow-y:auto;padding:1rem 1rem 1.5rem;box-sizing:border-box}
+.modal-sheet{background:var(--surface);border-radius:var(--radius) var(--radius) 0 0;width:100%;max-width:680px;margin-left:auto;margin-right:auto;max-height:90vh;overflow-y:auto;overflow-x:hidden;padding:1rem 1rem 2rem;box-sizing:border-box;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
 .modal-handle{width:36px;height:4px;background:var(--border2);border-radius:2px;margin:0 auto .7rem}
 .modal-title{font-size:.98rem;font-weight:600;margin-bottom:.9rem}
 .modal-footer{display:flex;gap:.55rem;margin-top:.9rem;padding-top:.7rem;border-top:1px solid var(--border)}
@@ -339,7 +339,7 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
 .hm-high{background:#FCEBEB;color:#A32D2D}
 .hm-critical{background:#A32D2D;color:#fff}
 .hm-dot{width:8px;height:8px;border-radius:50%;background:currentColor;margin:1px}
-.undo-bar{position:fixed;bottom:72px;left:50%;transform:translateX(-50%);background:#1a1814;color:#fff;padding:.5rem 1rem;border-radius:20px;font-size:.82rem;z-index:8000;display:flex;align-items:center;gap:.75rem;white-space:nowrap}
+.undo-bar{position:fixed;bottom:68px;left:50%;transform:translateX(-50%);background:#1a1814;color:#fff;padding:.5rem 1rem;border-radius:20px;font-size:.82rem;z-index:8000;display:flex;align-items:center;gap:.75rem;white-space:nowrap}
 .undo-btn{background:#534AB7;border:none;color:#fff;padding:.2rem .65rem;border-radius:12px;font-size:.78rem;cursor:pointer}
 .save-indicator{font-size:.7rem;color:var(--text3);display:flex;align-items:center;gap:.3rem;transition:.3s}
 .save-dot{width:6px;height:6px;border-radius:50%;background:var(--green);flex-shrink:0}
@@ -425,6 +425,7 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
 </div>
 <div id="app">
   <div class="top-bar">
+    <button class="top-bar-btn" id="top-back-btn" onclick="goTo('dashboard')" title="Kembali ke Beranda" style="display:none;font-size:1.1rem">&#8592;</button>
     <span class="top-bar-title" id="page-title">Dashboard</span>
     <button class="top-bar-btn" onclick="openModal('modal-settings')" title="Pengaturan">&#9881;</button>
     <button class="top-bar-btn" onclick="openModal('modal-export')" title="Ekspor">&#8679;</button>
@@ -454,7 +455,7 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
         <span class="sec-title">Risk Register</span>
         <button class="btn-sm btn-primary" onclick="goTo('risk')">Kelola</button>
       </div>
-      <div id="dash-risk-preview"></div>
+      <div id="dash-risk-preview" style="padding-bottom:1.5rem"></div>
     </div>
     <div class="screen" id="screen-statistik">
       <div class="sec-hdr" style="margin-bottom:.85rem"><span class="sec-title">Statistik per lini bisnis</span></div>
@@ -1259,21 +1260,6 @@ function unlockApp(){
 const ALL_SCREENS=['dashboard','plan','statistik','risk','penugasan','temuan','fieldnotes'];
 const SCREEN_TITLES={dashboard:'Dashboard',plan:'Audit Plan',statistik:'Statistik',risk:'Risk Register',penugasan:'Penugasan',temuan:'Temuan & Follow-up',fieldnotes:'Catatan Lapangan'};
 
-function goTo(n){
-  ALL_SCREENS.forEach(s=>{
-    const sc=document.getElementById('screen-'+s);if(sc)sc.classList.toggle('active',s===n);
-    const nv=document.getElementById('nav-'+s);if(nv)nv.classList.toggle('active',s===n);
-  });
-  const el=document.getElementById('page-title');
-  if(el)el.textContent=SCREEN_TITLES[n]||n;
-  if(n==='dashboard')rDash();
-  if(n==='plan')renderPlan();
-  if(n==='statistik')renderStatistik();
-  if(n==='risk')renderRisk();
-  if(n==='penugasan')renderPen(curPenTab);
-  if(n==='temuan'){renderTemuan();renderFU();renderLog();}
-  if(n==='fieldnotes')renderFieldnotes();
-}
 function setTab(g,t,el){
   if(g==='pen'){
     document.querySelectorAll('#screen-penugasan .tab').forEach(x=>x.classList.remove('active'));
@@ -1317,8 +1303,11 @@ function openModal(id){
   document.getElementById(id).classList.add('open');
 }
 function closeM(id){
-  document.getElementById(id).classList.remove('open');
   const modal=document.getElementById(id);
+  if(!modal)return;
+  modal.classList.remove('open');
+  // Jangan reset field di settings — user mungkin ingin batal tanpa kehilangan data
+  if(id==='modal-settings')return;
   modal.querySelectorAll('input:not([type=hidden]),select,textarea').forEach(el=>{
     if(el.type!=='file'&&el.type!=='number')el.value='';
     if(el.tagName==='SELECT')el.selectedIndex=0;
@@ -2382,9 +2371,6 @@ function scheduleDeadlineChecks(){
 // ══════════════════════════════════════════════
 // RENDER ALL
 // ══════════════════════════════════════════════
-function renderAll(){
-  rDash();renderRisk();renderPen('semua');renderTemuan();renderFU();renderFieldnotes();
-}
 
 // ══════════════════════════════════════════════
 // PWA MANIFEST
@@ -2666,24 +2652,10 @@ function fallbackCopy(txt){const ta=document.createElement('textarea');ta.value=
 // PATCH goTo — tambah fieldnotes
 // ═══════════════════════════════════════════════
 const _goToFinal=goTo;
-function goTo(n){
-  const allSc=['dashboard','plan','statistik','risk','penugasan','temuan','fieldnotes'];
-  allSc.forEach(s=>{const sc=document.getElementById('screen-'+s);if(sc)sc.classList.toggle('active',s===n);const nv=document.getElementById('nav-'+s);if(nv)nv.classList.toggle('active',s===n)});
-  const titles={dashboard:'Dashboard',plan:'Audit Plan',statistik:'Statistik',risk:'Risk Register',penugasan:'Penugasan',temuan:'Temuan & Follow-up',fieldnotes:'Catatan Lapangan'};
-  const el=document.getElementById('page-title');if(el)el.textContent=titles[n]||n;
-  if(n==='dashboard')rDash();
-  if(n==='plan')renderPlan();
-  if(n==='statistik')renderStatistik();
-  if(n==='risk')renderRisk();
-  if(n==='penugasan')renderPen(curPenTab);
-  if(n==='temuan'){renderTemuan();renderFU();renderLog()}
-  if(n==='fieldnotes')renderFieldnotes()
-}
 
 // ═══════════════════════════════════════════════
 // PATCH renderAll — tambah fieldnotes + plan
 // ═══════════════════════════════════════════════
-function renderAll(){rDash();renderRisk();renderPen('semua');renderTemuan();renderFU();renderPlan();renderFieldnotes()}
 
 
 // ═══════════════════════════════════════════════
@@ -2856,24 +2828,6 @@ function terbitkanDariDraft(id){
 // PATCH goTo & renderAll — tambah laporan
 // ═══════════════════════════════════════════════
 const _goToLap=goTo;
-function goTo(n){
-  const allSc=['dashboard','plan','statistik','risk','penugasan','temuan','fieldnotes','laporan'];
-  allSc.forEach(s=>{
-    const sc=document.getElementById('screen-'+s);if(sc)sc.classList.toggle('active',s===n);
-    const nv=document.getElementById('nav-'+s);if(nv)nv.classList.toggle('active',s===n);
-  });
-  const titles={dashboard:'Dashboard',plan:'Audit Plan',statistik:'Statistik',risk:'Risk Register',penugasan:'Penugasan',temuan:'Temuan & Follow-up',fieldnotes:'Catatan Lapangan',laporan:'Daftar Laporan'};
-  const el=document.getElementById('page-title');if(el)el.textContent=titles[n]||n;
-  if(n==='dashboard')rDash();
-  if(n==='plan')renderPlan();
-  if(n==='statistik')renderStatistik();
-  if(n==='risk')renderRisk();
-  if(n==='penugasan')renderPen(curPenTab);
-  if(n==='temuan'){renderTemuan();renderFU();renderLog();}
-  if(n==='fieldnotes')renderFieldnotes();
-  if(n==='laporan')renderLaporan();
-}
-function renderAll(){rDash();renderRisk();renderPen('semua');renderTemuan();renderFU();renderPlan();renderFieldnotes();renderLaporan();}
 
 
 // ═══════════════════════════════════════════════
@@ -3486,6 +3440,77 @@ function migrateRisks(){
     if(!r.status)r.status='Open';
   });
   if(migrated>0){save();addLog('Migrasi Risk',migrated+' risk lama diupgrade ke format RBIA v2');}
+}
+
+
+// ═══════════════════════════════════════════════
+// SWIPE DOWN TO CLOSE MODAL
+// ═══════════════════════════════════════════════
+(function(){
+  let startY=0, startX=0, activeModal=null;
+  document.addEventListener('touchstart', e=>{
+    const handle = e.target.closest('.modal-handle');
+    if(handle){
+      startY=e.touches[0].clientY;
+      startX=e.touches[0].clientX;
+      activeModal=handle.closest('.modal-backdrop');
+    }
+  },{passive:true});
+  document.addEventListener('touchend', e=>{
+    if(!activeModal)return;
+    const dy=e.changedTouches[0].clientY-startY;
+    const dx=Math.abs(e.changedTouches[0].clientX-startX);
+    if(dy>60&&dx<40){
+      // Swipe down > 60px di handle → tutup modal
+      const id=activeModal.id;
+      if(id)closeM(id);
+    }
+    activeModal=null;
+  },{passive:true});
+})();
+
+// ═══════════════════════════════════════════════  
+// UPDATE goTo — tampilkan/sembunyikan tombol back
+// ═══════════════════════════════════════════════
+const _goToWithBack = goTo;
+
+
+// ═══════════════════════════════════════════════
+// goTo — navigasi utama (single definition)
+// ═══════════════════════════════════════════════
+function goTo(n){
+  const allSc=['dashboard','plan','statistik','risk','penugasan','temuan','fieldnotes','laporan'];
+  const titles={
+    dashboard:'Dashboard',plan:'Audit Plan',statistik:'Statistik',
+    risk:'Risk Register',penugasan:'Penugasan',temuan:'Temuan & Follow-up',
+    fieldnotes:'Catatan Lapangan',laporan:'Daftar Laporan'
+  };
+  allSc.forEach(s=>{
+    const sc=document.getElementById('screen-'+s);
+    if(sc)sc.classList.toggle('active',s===n);
+    const nv=document.getElementById('nav-'+s);
+    if(nv)nv.classList.toggle('active',s===n);
+  });
+  const titleEl=document.getElementById('page-title');
+  if(titleEl)titleEl.textContent=titles[n]||n;
+  // Tombol back: sembunyikan di dashboard, tampilkan di halaman lain
+  const backBtn=document.getElementById('top-back-btn');
+  if(backBtn)backBtn.style.display=n==='dashboard'?'none':'flex';
+  // Render konten halaman
+  if(n==='dashboard')rDash();
+  if(n==='plan')renderPlan();
+  if(n==='statistik')renderStatistik();
+  if(n==='risk')renderRisk();
+  if(n==='penugasan')renderPen(curPenTab||'semua');
+  if(n==='temuan'){renderTemuan();renderFU();renderLog();}
+  if(n==='fieldnotes')renderFieldnotes();
+  if(n==='laporan')renderLaporan();
+}
+
+
+function renderAll(){
+  rDash();renderRisk();renderPen('semua');renderTemuan();
+  renderFU();renderPlan();renderFieldnotes();renderLaporan();
 }
 
 </script>
