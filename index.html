@@ -57,12 +57,12 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .top-bar-title{font-size:1rem;font-weight:600;flex:1}
 .top-bar-btn{width:36px;height:36px;border-radius:var(--radius-sm);border:none;background:transparent;color:var(--text2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0}
 .top-bar-btn:active{background:var(--surface2)}
-main{flex:1;padding:.85rem;max-width:680px;margin:0 auto;width:100%;padding-bottom:8rem}
+main{flex:1;padding:.85rem;max-width:680px;margin:0 auto;width:100%;padding-bottom:5rem}
 .bottom-nav{position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-top:1px solid var(--border);display:grid;grid-template-columns:repeat(5,1fr);height:58px;z-index:450}
 .nav-item{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;border:none;background:transparent;color:var(--text3);font-size:.62rem;cursor:pointer;padding:.35rem}
 .nav-item.active{color:var(--purple)}
 .nav-ico{font-size:1.25rem;line-height:1}
-.screen{display:none}.screen.active{display:block}
+.screen{display:none}.screen.active{display:block}.screen.has-fab{padding-bottom:5rem}
 .kpi-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:.6rem;margin-bottom:.85rem}
 .kpi-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:.85rem;cursor:pointer}
 .kpi-label{font-size:.68rem;color:var(--text3);text-transform:uppercase;letter-spacing:.04em;margin-bottom:.25rem}
@@ -163,7 +163,7 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
 .empty-ttl{font-size:.92rem;font-weight:500;color:var(--text2);margin-bottom:.2rem}
 .empty-sub{font-size:.8rem}
 .disclaimer{background:var(--amber-bg);border:1px solid var(--amber);border-radius:var(--radius-sm);padding:.65rem .9rem;font-size:.77rem;color:var(--amber-text);margin-bottom:.7rem;display:flex;gap:.5rem;align-items:flex-start}
-.fab{background:var(--purple);color:#fff;border:none;border-radius:50%;width:50px;height:50px;font-size:1.45rem;position:fixed;bottom:70px;right:1rem;cursor:pointer;z-index:200;display:flex;align-items:center;justify-content:center;transition:.15s}
+.fab{background:var(--purple);color:#fff;border:none;border-radius:50%;width:50px;height:50px;font-size:1.45rem;position:fixed;bottom:64px;right:1rem;cursor:pointer;z-index:200;display:flex;align-items:center;justify-content:center;transition:.15s}
 .fab:active{transform:scale(.91)}
 .toast{position:fixed;bottom:70px;left:50%;transform:translateX(-50%);background:#1a1814ee;color:#fff;padding:.5rem 1.1rem;border-radius:20px;font-size:.8rem;z-index:9000;opacity:0;transition:.22s;pointer-events:none;white-space:nowrap}
 .toast.show{opacity:1}
@@ -455,7 +455,7 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
         <span class="sec-title">Risk Register</span>
         <button class="btn-sm btn-primary" onclick="goTo('risk')">Kelola</button>
       </div>
-      <div id="dash-risk-preview" style="padding-bottom:1.5rem"></div>
+      <div id="dash-risk-preview"></div>
     </div>
     <div class="screen" id="screen-statistik">
       <div class="sec-hdr" style="margin-bottom:.85rem"><span class="sec-title">Statistik per lini bisnis</span></div>
@@ -475,11 +475,11 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
         <div id="stat-closed-chart"></div>
       </div>
     </div>
-    <div class="screen" id="screen-risk">
+    <div class="screen has-fab" id="screen-risk">
       <div class="search-wrap"><input class="search-input" id="risk-search" placeholder="Cari area audit..." oninput="renderRisk()"></div>
       <div class="stat-row" id="risk-stats"></div>
       <div class="sec-hdr"><span class="sec-title" id="risk-count">&#8212;</span><button class="btn-sm btn-primary" onclick="openAddRisk()">+ Tambah risiko</button></div>
-      <div id="risk-list" style="padding-bottom:2rem"></div>
+      <div id="risk-list"></div>
       <div id="risk-detail" style="display:none;margin-top:.5rem"></div>
     </div>
     <div class="screen" id="screen-plan">
@@ -512,7 +512,7 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
       <div class="sec-hdr"><span class="sec-title" id="pen-count">&#8212;</span><button class="btn-sm btn-primary" onclick="openModal('modal-penugasan')">+ Tambah</button></div>
       <div id="pen-list"></div>
     </div>
-    <div class="screen" id="screen-temuan">
+    <div class="screen has-fab" id="screen-temuan">
       <div class="tab-bar">
         <button class="tab active" onclick="setTab('tf','temuan',this)">Temuan</button>
         <button class="tab" onclick="setTab('tf','followup',this)">Follow-up</button>
@@ -536,7 +536,7 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
           <button class="btn-sm" onclick="clearTemuanDateFilter()" style="font-size:.75rem;padding:.25rem .6rem">Reset</button>
         </div>
         <div class="sec-hdr"><span class="sec-title" id="temuan-count">&#8212;</span><button class="btn-sm btn-primary" onclick="openModal('modal-temuan')">+ Tambah</button></div>
-        <div id="temuan-list" style="padding-bottom:2rem"></div>
+        <div id="temuan-list"></div>
         <div id="temuan-detail" style="display:none"></div>
       </div>
       <div id="tf-followup" style="display:none">
@@ -547,7 +547,7 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
           <button class="filter-btn" id="ffu-all" onclick="setFU('all',this)">Semua</button>
         </div>
         <div class="sec-hdr"><span class="sec-title" id="fu-count">&#8212;</span></div>
-        <div id="fu-list" style="padding-bottom:2rem"></div>
+        <div id="fu-list"></div>
       </div>
       <div id="tf-log" style="display:none">
         <div class="sec-hdr"><span class="sec-title">Riwayat perubahan</span><button class="btn-sm btn-danger" onclick="clearLog()">Bersihkan</button></div>
@@ -570,11 +570,11 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
         <button class="tab" onclick="setLapTab('Draft',this)">Draft</button>
         <button class="tab" onclick="setLapTab('Void',this)">Void</button>
       </div>
-      <div id="lap-list" style="padding-bottom:2rem"></div>
+      <div id="lap-list"></div>
     </div>
 
     <!-- SCREEN: CATATAN LAPANGAN -->
-    <div class="screen" id="screen-fieldnotes">
+    <div class="screen has-fab" id="screen-fieldnotes">
       <div class="search-wrap">
         <input class="search-input" id="fn-search" placeholder="Cari catatan..." oninput="renderFieldnotes()">
         <select id="fn-filter-pen" onchange="renderFieldnotes()" style="font-size:.8rem;padding:.3rem .6rem;border-radius:20px;height:32px">
@@ -592,7 +592,7 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
         <span class="sec-title" id="fn-count">— catatan</span>
         <button class="btn-sm btn-primary" onclick="openModal('modal-fn')">+ Catat</button>
       </div>
-      <div id="fn-list" style="padding-bottom:2rem"></div>
+      <div id="fn-list"></div>
     </div>
   </main>
   <nav class="bottom-nav" style="grid-template-columns:repeat(5,1fr)">
