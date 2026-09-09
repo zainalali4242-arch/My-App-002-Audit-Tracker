@@ -477,8 +477,9 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
     <div class="screen" id="screen-risk">
       <div class="search-wrap"><input class="search-input" id="risk-search" placeholder="Cari area audit..." oninput="renderRisk()"></div>
       <div class="stat-row" id="risk-stats"></div>
-      <div class="sec-hdr"><span class="sec-title" id="risk-count">&#8212;</span><button class="btn-sm btn-primary" onclick="openModal('modal-risk')">+ Tambah</button></div>
+      <div class="sec-hdr"><span class="sec-title" id="risk-count">&#8212;</span><button class="btn-sm btn-primary" onclick="openAddRisk()">+ Tambah risiko</button></div>
       <div id="risk-list"></div>
+      <div id="risk-detail" style="display:none;margin-top:.5rem"></div>
     </div>
     <div class="screen" id="screen-plan">
       <div class="sec-hdr" style="margin-bottom:.85rem">
@@ -607,17 +608,110 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
 <div class="modal-backdrop" id="modal-risk" onclick="closeBg(event,'modal-risk')">
   <div class="modal-sheet">
     <div class="modal-handle"></div>
-    <div class="modal-title" id="risk-mtitle">Tambah area audit</div>
+    <div class="modal-title" id="risk-mtitle">Tambah area risiko</div>
     <input type="hidden" id="risk-eid">
-    <div class="form-group"><label class="form-label">Nama area / unit<span>*</span></label><input type="text" id="risk-nama" placeholder="cth: Gudang Alat Berat Pit A"></div>
-    <div class="form-row">
-      <div class="form-group"><label class="form-label">Kategori<span>*</span></label><select id="risk-kat"><option value="">Pilih...</option><option>Operasional</option><option>Finansial</option><option>K3</option><option>Kepatuhan</option><option>Aset</option><option>Vendor/Kontrak</option><option>IT/Sistem</option></select></div>
-      <div class="form-group"><label class="form-label">Lini bisnis</label><select id="risk-lini"><option value="">Semua</option><option>Mining</option><option>Rental Alat Berat</option><option>Core Drilling</option></select></div>
+    <div style="font-size:.72rem;color:var(--purple-text);font-family:monospace;margin-bottom:.65rem;min-height:1rem" id="risk-id-preview"></div>
+
+    <div class="form-section">Identifikasi</div>
+    <div class="form-group"><label class="form-label">Nama / area risiko<span>*</span></label>
+      <input type="text" id="risk-nama" placeholder="cth: Pengelolaan BBM di Pit A">
     </div>
-    <div class="form-group"><label class="form-label">Tingkat risiko<span>*</span></label><div class="radio-group" id="risk-lvl"><span class="radio-opt" onclick="selR('risk-lvl',this)">High</span><span class="radio-opt" onclick="selR('risk-lvl',this)">Medium</span><span class="radio-opt" onclick="selR('risk-lvl',this)">Low</span></div></div>
-    <div class="form-group"><label class="form-label">Deskripsi risiko utama</label><textarea id="risk-desk" placeholder="Apa yang bisa salah di area ini?"></textarea></div>
-    <div class="form-group"><label class="form-label">Prioritas audit</label><div class="radio-group" id="risk-prior"><span class="radio-opt" onclick="selR('risk-prior',this)">Segera</span><span class="radio-opt" onclick="selR('risk-prior',this)">Tahun ini</span><span class="radio-opt" onclick="selR('risk-prior',this)">Berikutnya</span></div></div>
-    <div class="modal-footer"><button class="btn-sm" onclick="closeM('modal-risk')">Batal</button><button class="btn-sm btn-primary" onclick="saveRisk()">Simpan</button></div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Kategori<span>*</span></label>
+        <select id="risk-kat">
+          <option value="Operasional">Operasional</option>
+          <option value="Finansial">Finansial</option>
+          <option value="K3">K3 / Keselamatan</option>
+          <option value="Kepatuhan">Kepatuhan / Regulasi</option>
+          <option value="Aset">Aset</option>
+          <option value="Fraud">Fraud / Kecurangan</option>
+          <option value="Vendor">Vendor / Kontrak</option>
+          <option value="IT">IT / Sistem</option>
+        </select>
+      </div>
+      <div class="form-group"><label class="form-label">Lini bisnis</label>
+        <select id="risk-lini">
+          <option value="Mining">Mining</option>
+          <option value="Rental Alat Berat">Rental Alat Berat</option>
+          <option value="Core Drilling">Core Drilling</option>
+          <option value="Korporat">Korporat</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group"><label class="form-label">Risk Owner (penanggung jawab risiko)<span>*</span></label>
+      <input type="text" id="risk-owner" placeholder="cth: Manager Operasional Pit A">
+    </div>
+
+    <div class="form-section">Deskripsi risiko</div>
+    <div class="form-group"><label class="form-label">Peristiwa risiko (Risk Event)<span>*</span></label>
+      <textarea id="risk-event" rows="2" placeholder="cth: Volume BBM yang diterima lebih rendah dari dokumen supplier"></textarea>
+    </div>
+    <div class="form-group"><label class="form-label">Penyebab (Risk Cause)</label>
+      <input type="text" id="risk-cause" placeholder="cth: Dokumen penerimaan tidak diverifikasi independen">
+    </div>
+    <div class="form-group"><label class="form-label">Dampak (Risk Consequence)<span>*</span></label>
+      <input type="text" id="risk-consequence" placeholder="cth: Kerugian finansial dan stock tidak akurat">
+    </div>
+
+    <div class="form-section">Penilaian risiko (Inherent Risk)</div>
+    <div style="background:var(--surface2);border-radius:var(--radius-sm);padding:.75rem;margin-bottom:.5rem">
+      <div class="lxi-matrix">
+        <div class="lxi-label">Likelihood<br><span style="font-size:.65rem;opacity:.7">1=Rare 5=Pasti</span></div>
+        <div class="lxi-btns" id="lxi-L">
+          <button class="lxi-btn" onclick="setLXI('L',1)">1</button>
+          <button class="lxi-btn" onclick="setLXI('L',2)">2</button>
+          <button class="lxi-btn" onclick="setLXI('L',3)">3</button>
+          <button class="lxi-btn" onclick="setLXI('L',4)">4</button>
+          <button class="lxi-btn" onclick="setLXI('L',5)">5</button>
+        </div>
+        <div class="lxi-label">Impact<br><span style="font-size:.65rem;opacity:.7">1=Kecil 5=Katastrofik</span></div>
+        <div class="lxi-btns" id="lxi-I">
+          <button class="lxi-btn" onclick="setLXI('I',1)">1</button>
+          <button class="lxi-btn" onclick="setLXI('I',2)">2</button>
+          <button class="lxi-btn" onclick="setLXI('I',3)">3</button>
+          <button class="lxi-btn" onclick="setLXI('I',4)">4</button>
+          <button class="lxi-btn" onclick="setLXI('I',5)">5</button>
+        </div>
+      </div>
+      <div class="score-preview" id="risk-score-preview">Pilih Likelihood &times; Impact</div>
+    </div>
+
+    <div class="form-section">Potensi kerugian (opsional)</div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Potensi kerugian per kejadian (Rp)</label>
+        <input type="number" id="risk-loss-event" placeholder="0" oninput="updateRiskFinancial()">
+      </div>
+      <div class="form-group"><label class="form-label">Frekuensi per tahun</label>
+        <input type="number" id="risk-loss-freq" placeholder="0" min="0" oninput="updateRiskFinancial()">
+      </div>
+    </div>
+    <div style="font-size:.8rem;color:var(--text2);padding:.35rem .5rem;background:var(--surface2);border-radius:var(--radius-sm);margin-bottom:.5rem" id="risk-apl-preview">Annual Potential Loss: —</div>
+
+    <div class="form-section">Status & prioritas</div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Prioritas audit</label>
+        <div class="radio-group" id="risk-prioritas">
+          <span class="radio-opt selected" onclick="selR('risk-prioritas',this)">Segera</span>
+          <span class="radio-opt" onclick="selR('risk-prioritas',this)">Tahun ini</span>
+          <span class="radio-opt" onclick="selR('risk-prioritas',this)">Berikutnya</span>
+        </div>
+      </div>
+      <div class="form-group"><label class="form-label">Risk Trend</label>
+        <div class="radio-group" id="risk-trend">
+          <span class="radio-opt" onclick="selR('risk-trend',this)">&#8593; Meningkat</span>
+          <span class="radio-opt selected" onclick="selR('risk-trend',this)">&#8594; Stabil</span>
+          <span class="radio-opt" onclick="selR('risk-trend',this)">&#8595; Menurun</span>
+        </div>
+      </div>
+    </div>
+    <div class="form-group"><label class="form-label">Catatan tambahan</label>
+      <textarea id="risk-desc" rows="2" placeholder="Riwayat kejadian, konteks, atau informasi tambahan..."></textarea>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-sm" onclick="closeM('modal-risk')">Batal</button>
+      <button class="btn-sm btn-primary" onclick="saveRisk()">Simpan</button>
+    </div>
   </div>
 </div>
 <div class="modal-backdrop" id="modal-penugasan" onclick="closeBg(event,'modal-penugasan')">
@@ -1292,33 +1386,21 @@ function doUndo(){
 // ══════════════════════════════════════════════
 // RISK REGISTER
 // ══════════════════════════════════════════════
-function saveRisk(){
-  const nama=document.getElementById('risk-nama').value.trim();
-  const kat=document.getElementById('risk-kat').value;
-  const lvl=getRad('risk-lvl');
-  if(!nama||!kat||!lvl){showToast('Lengkapi field wajib');return}
-  const eid=document.getElementById('risk-eid').value;
-  const obj={id:eid||uid(),nama,kategori:kat,lini:document.getElementById('risk-lini').value,level:lvl,deskripsi:document.getElementById('risk-desk').value,prioritas:getRad('risk-prior'),createdAt:eid?(DB.risks.find(r=>r.id===eid)||{}).createdAt:today()};
-  if(eid){const i=DB.risks.findIndex(r=>r.id===eid);DB.risks[i]=obj;addLog('Edit Risk',obj.nama)}
-  else{DB.risks.push(obj);addLog('Tambah Risk',obj.nama)}
-  save();closeM('modal-risk');renderRisk();showToast(eid?'Diperbarui':'Ditambahkan');
-}
-function editRisk(id){
-  const r=DB.risks.find(x=>x.id===id);if(!r)return;
-  const mt=document.getElementById('risk-mtitle');if(mt)mt.textContent='Edit area audit';
-  document.getElementById('risk-eid').value=r.id;
-  document.getElementById('risk-nama').value=r.nama;
-  document.getElementById('risk-kat').value=r.kategori;
-  document.getElementById('risk-lini').value=r.lini||'';
-  document.getElementById('risk-desk').value=r.deskripsi||'';
-  setRV('risk-lvl',r.level);setRV('risk-prior',r.prioritas||'');
-  openModal('modal-risk');
-}
 function delRisk(id){const r=DB.risks.find(x=>x.id===id);if(!r)return;safeDelete('risk',id,r.nama)}
+function riskLevelFromScore(s){return s>=15?'Critical':s>=10?'High':s>=5?'Medium':'Low'}
+function riskScoreBadgeClass(s){return s>=15?'rs-critical':s>=10?'rs-high':s>=5?'rs-medium':'rs-low'}
+function riskLevelFromOld(level){return level==='High'?'High':level==='Medium'?'Medium':'Low'}
+
 function renderRisk(){
   const q=(document.getElementById('risk-search').value||'').toLowerCase();
-  let items=[...DB.risks].filter(r=>!q||r.nama.toLowerCase().includes(q)||r.kategori.toLowerCase().includes(q));
-  items.sort((a,b)=>({High:0,Medium:1,Low:2}[a.level]||1)-({High:0,Medium:1,Low:2}[b.level]||1));
+  let items=[...DB.risks].filter(r=>!q||r.nama.toLowerCase().includes(q)||(r.kategori||'').toLowerCase().includes(q)||(r.riskId||'').toLowerCase().includes(q));
+  // Sort: Critical > High > Medium > Low, then by score desc
+  const lvlO=l=>l==='Critical'?0:l==='High'?1:l==='Medium'?2:3;
+  items.sort((a,b)=>{
+    const la=a.riskScore?riskLevelFromScore(a.riskScore):riskLevelFromOld(a.level||'Low');
+    const lb=b.riskScore?riskLevelFromScore(b.riskScore):riskLevelFromOld(b.level||'Low');
+    return lvlO(la)-lvlO(lb)||(b.riskScore||0)-(a.riskScore||0);
+  });
   const cnt=document.getElementById('risk-count');if(cnt)cnt.textContent=items.length+' area audit';
   const h=DB.risks.filter(r=>r.level==='High').length,m=DB.risks.filter(r=>r.level==='Medium').length,l=DB.risks.filter(r=>r.level==='Low').length;
   const st=document.getElementById('risk-stats');
@@ -3139,18 +3221,21 @@ function renderDashRisk(){
     return;
   }
   // Tampilkan ringkasan per level
-  const h=DB.risks.filter(r=>r.level==='High').length;
-  const m=DB.risks.filter(r=>r.level==='Medium').length;
-  const l=DB.risks.filter(r=>r.level==='Low').length;
+  const getLvl=r=>r.riskScore?riskLevelFromScore(r.riskScore):riskLevelFromOld(r.level||'Low');
+  const crit=DB.risks.filter(r=>getLvl(r)==='Critical').length;
+  const h=DB.risks.filter(r=>getLvl(r)==='High').length;
+  const m=DB.risks.filter(r=>getLvl(r)==='Medium').length;
+  const l=DB.risks.filter(r=>getLvl(r)==='Low').length;
   const tot=DB.risks.length;
   // Top 3 High risk belum ada penugasan
   const auditedIds=new Set(DB.penugasans.map(p=>p.lini).filter(Boolean));
   const topRisks=[...DB.risks]
-    .sort((a,b)=>({High:0,Medium:1,Low:2}[a.level]||1)-({High:0,Medium:1,Low:2}[b.level]||1))
+    .sort((a,b)=>(b.riskScore||0)-(a.riskScore||0))
     .slice(0,3);
   el.innerHTML=`
     <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:.85rem;margin-bottom:.5rem">
       <div style="display:flex;gap:.5rem;margin-bottom:.65rem;flex-wrap:wrap">
+        ${crit?`<span style="font-size:.8rem;background:#501313;color:#fff;padding:3px 9px;border-radius:20px;font-weight:500">${crit} Critical</span>`:''}
         <span style="font-size:.8rem;background:var(--red-bg);color:var(--red-text);padding:3px 9px;border-radius:20px;font-weight:500">${h} High</span>
         <span style="font-size:.8rem;background:var(--amber-bg);color:var(--amber-text);padding:3px 9px;border-radius:20px;font-weight:500">${m} Medium</span>
         <span style="font-size:.8rem;background:var(--green-bg);color:var(--green-text);padding:3px 9px;border-radius:20px;font-weight:500">${l} Low</span>
@@ -3167,6 +3252,242 @@ function renderDashRisk(){
       }).join('')}
     </div>`;
 }
+
+// ═══════════════════════════════════════════════
+// RISK REGISTER v2 — Phase 1 RBIA
+// ═══════════════════════════════════════════════
+
+// State sementara L×I
+let _rL=0,_rI=0;
+
+function openAddRisk(){
+  const mt=document.getElementById('risk-mtitle');if(mt)mt.textContent='Tambah area risiko';
+  document.getElementById('risk-eid').value='';
+  ['risk-nama','risk-owner','risk-event','risk-cause','risk-consequence','risk-desc'].forEach(id=>{const e=document.getElementById(id);if(e)e.value=''});
+  ['risk-loss-event','risk-loss-freq'].forEach(id=>{const e=document.getElementById(id);if(e)e.value=''});
+  _rL=0;_rI=0;
+  renderLXIButtons();
+  updateRiskScorePreview();
+  updateRiskFinancial();
+  const idPrev=document.getElementById('risk-id-preview');
+  if(idPrev)idPrev.textContent='ID akan digenerate otomatis saat disimpan';
+  setRV('risk-prioritas','Segera');
+  setRV('risk-trend','\u2192 Stabil');
+  openModal('modal-risk');
+}
+
+function setLXI(dim,val){
+  if(dim==='L')_rL=val;else _rI=val;
+  renderLXIButtons();
+  updateRiskScorePreview();
+}
+
+function renderLXIButtons(){
+  ['L','I'].forEach(dim=>{
+    const val=dim==='L'?_rL:_rI;
+    const cls=dim==='L'?'sel-L':'sel-I';
+    document.querySelectorAll(`#lxi-${dim} .lxi-btn`).forEach((btn,i)=>{
+      btn.classList.toggle(cls,i+1===val);
+    });
+  });
+}
+
+function updateRiskScorePreview(){
+  const el=document.getElementById('risk-score-preview');if(!el)return;
+  if(!_rL||!_rI){el.textContent='Pilih Likelihood \u00d7 Impact';el.style.background='var(--surface2)';el.style.color='var(--text3)';return}
+  const s=_rL*_rI;
+  const level=s>=15?'Critical':s>=10?'High':s>=5?'Medium':'Low';
+  const colors={Critical:['#501313','#FCEBEB'],High:['#791F1F','#FCEBEB'],Medium:['#633806','#FAEEDA'],Low:['#27500A','#EAF3DE']};
+  const [tc,bg]=colors[level];
+  el.textContent=`Score: ${_rL}\u00d7${_rI} = ${s} \u2192 ${level}`;
+  el.style.background=bg;el.style.color=tc;
+}
+
+function updateRiskFinancial(){
+  const lossEl=document.getElementById('risk-loss-event');
+  const freqEl=document.getElementById('risk-loss-freq');
+  const prevEl=document.getElementById('risk-apl-preview');
+  if(!prevEl)return;
+  const loss=parseFloat(lossEl?.value)||0;
+  const freq=parseFloat(freqEl?.value)||0;
+  if(!loss&&!freq){prevEl.textContent='Annual Potential Loss: \u2014';return}
+  const apl=loss*freq;
+  prevEl.textContent='Annual Potential Loss: Rp '+apl.toLocaleString('id-ID');
+}
+
+function genRiskId(kategori,lini){
+  if(!DB.risks)DB.risks=[];
+  const catCode={Operasional:'OPS',Finansial:'FIN','K3':'K3',Kepatuhan:'REG',Aset:'AST',Fraud:'FRD',Vendor:'VND',IT:'ITS'}[kategori]||'RSK';
+  const yr=new Date().getFullYear().toString().slice(-2);
+  const existing=DB.risks.filter(r=>r.riskId&&r.riskId.startsWith('RISK-'+catCode));
+  const nextNum=existing.length+1;
+  return `RISK-${catCode}-${String(nextNum).padStart(3,'0')}`;
+}
+
+function saveRisk(){
+  const nama=document.getElementById('risk-nama').value.trim();
+  const owner=document.getElementById('risk-owner').value.trim();
+  const event=document.getElementById('risk-event').value.trim();
+  const consequence=document.getElementById('risk-consequence').value.trim();
+  if(!nama||!owner||!event||!consequence){showToast('Isi field wajib: Nama, Owner, Risk Event, Consequence');return}
+  if(!_rL||!_rI){showToast('Pilih nilai Likelihood dan Impact');return}
+  const eid=document.getElementById('risk-eid').value;
+  const old=eid?DB.risks.find(r=>r.id===eid):null;
+  const kat=document.getElementById('risk-kat').value;
+  const score=_rL*_rI;
+  const level=score>=15?'Critical':score>=10?'High':score>=5?'Medium':'Low';
+  const lossEvent=parseFloat(document.getElementById('risk-loss-event').value)||0;
+  const lossFreq=parseFloat(document.getElementById('risk-loss-freq').value)||0;
+  const riskId=eid&&old?.riskId?old.riskId:genRiskId(kat);
+  const now=new Date().toISOString();
+  // History entry
+  const histEntry={ts:now,likelihood:_rL,impact:_rI,score,level,by:'Auditor',note:eid?'Update penilaian':'Initial assessment'};
+  const prevHistory=(old&&old._history)||[];
+  // Cek apakah ada perubahan score
+  const scoreChanged=old&&(old.likelihood!==_rL||old.impact!==_rI);
+  const obj={
+    id:eid||uid(),
+    riskId,
+    nama,
+    riskOwner:owner,
+    kategori:kat,
+    lini:document.getElementById('risk-lini').value,
+    riskEvent:event,
+    riskCause:document.getElementById('risk-cause').value,
+    riskConsequence:consequence,
+    deskripsi:document.getElementById('risk-desc').value,
+    likelihood:_rL,
+    impact:_rI,
+    riskScore:score,
+    level,
+    // backward compat
+    lossPerEvent:lossEvent,
+    lossFreq:lossFreq,
+    annualPotentialLoss:lossEvent*lossFreq,
+    prioritas:getRad('risk-prioritas')||'Segera',
+    trend:getRad('risk-trend')||'\u2192 Stabil',
+    status:'Open',
+    createdAt:eid?old.createdAt:now,
+    updatedAt:now,
+    _history:[...prevHistory,histEntry]
+  };
+  if(eid){
+    const i=DB.risks.findIndex(r=>r.id===eid);
+    DB.risks[i]=obj;
+    addLog('Update Risk',`${riskId} ${nama} \u2192 ${level} (${score})${scoreChanged?' [score berubah]':''}`);
+    showToast('Risk diperbarui'+( scoreChanged?' — score berubah, history tercatat':'')); 
+  }else{
+    DB.risks.push(obj);
+    addLog('Tambah Risk',`${riskId} ${nama} [${level} / score ${score}]`);
+    showToast('Risk '+riskId+' ditambahkan ['+level+']');
+  }
+  save();closeM('modal-risk');renderRisk();renderDashRisk();rDash();
+}
+
+function editRisk(id){
+  const r=DB.risks.find(x=>x.id===id);if(!r)return;
+  const mt=document.getElementById('risk-mtitle');if(mt)mt.textContent='Edit risiko';
+  document.getElementById('risk-eid').value=r.id;
+  document.getElementById('risk-nama').value=r.nama||'';
+  document.getElementById('risk-owner').value=r.riskOwner||'';
+  document.getElementById('risk-event').value=r.riskEvent||r.deskripsi||'';
+  document.getElementById('risk-cause').value=r.riskCause||'';
+  document.getElementById('risk-consequence').value=r.riskConsequence||'';
+  document.getElementById('risk-desc').value=r.deskripsi||'';
+  const katEl=document.getElementById('risk-kat');if(katEl)katEl.value=r.kategori||'Operasional';
+  const liniEl=document.getElementById('risk-lini');if(liniEl)liniEl.value=r.lini||'Mining';
+  document.getElementById('risk-loss-event').value=r.lossPerEvent||'';
+  document.getElementById('risk-loss-freq').value=r.lossFreq||'';
+  // Restore L×I
+  _rL=r.likelihood||0;_rI=r.impact||0;
+  // Kalau data lama belum punya L×I, mapping dari level
+  if(!_rL){const m={High:4,Medium:3,Low:2,Critical:5};_rL=m[r.level]||3}
+  if(!_rI){const m={High:4,Medium:3,Low:2,Critical:5};_rI=m[r.level]||3}
+  renderLXIButtons();
+  updateRiskScorePreview();
+  updateRiskFinancial();
+  setRV('risk-prioritas',r.prioritas||'Segera');
+  setRV('risk-trend',r.trend||'\u2192 Stabil');
+  const idPrev=document.getElementById('risk-id-preview');
+  if(idPrev)idPrev.textContent=r.riskId||'(ID lama — akan di-generate)';
+  openModal('modal-risk');
+}
+
+// showRiskDetail — tampilkan detail risk + history
+function showRiskDetail(id){
+  const r=DB.risks.find(x=>x.id===id);if(!r)return;
+  const score=r.riskScore||(r.level==='High'?12:r.level==='Medium'?6:2);
+  const level=r.riskScore?riskLevelFromScore(score):riskLevelFromOld(r.level||'Medium');
+  const bcls=riskScoreBadgeClass(score);
+  const colors={Critical:'#501313',High:'#791F1F',Medium:'#633806',Low:'#27500A'};
+  const apl=r.annualPotentialLoss;
+  const hist=(r._history||[]).slice().reverse().slice(0,5);
+  const histHTML=hist.length?`<div class="detail-section"><div class="detail-label">Riwayat perubahan score</div>${hist.map(h=>`<div class="risk-history-item"><span style="opacity:.6">${fD(h.ts?.slice(0,10))}</span><span>L${h.likelihood}\u00d7I${h.impact}=${h.score} \u2192 ${h.level}</span><span style="opacity:.6">${esc(h.note||'')}</span></div>`).join('')}</div>`:'';
+  // Cari temuan terkait risk ini
+  const relTemuan=DB.temuan.filter(t=>t.riskId===r.id||t.riskRef===r.riskId);
+  const el=document.getElementById('risk-detail');if(!el)return;
+  el.style.display='block';
+  el.innerHTML=`<div class="detail-panel">
+    <div class="detail-header">
+      <div style="flex:1">
+        <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.3rem">
+          <span class="risk-score-badge ${bcls}" style="font-size:1rem;width:36px;height:36px">${score}</span>
+          <div>
+            <div style="font-size:.97rem;font-weight:600">${esc(r.nama)}</div>
+            ${r.riskId?`<span class="risk-id">${esc(r.riskId)}</span>`:''}
+          </div>
+        </div>
+        <div style="display:flex;gap:.35rem;flex-wrap:wrap">
+          <span class="badge ${level==='Critical'||level==='High'?'badge-high':level==='Medium'?'badge-med':'badge-low'}">${level}</span>
+          <span class="badge badge-neutral">${esc(r.kategori)}</span>
+          <span class="badge badge-neutral">${esc(r.lini)}</span>
+          ${r.trend?`<span style="font-size:.75rem;padding:.1rem .4rem">${esc(r.trend)}</span>`:''}
+        </div>
+      </div>
+      <button class="btn-sm" onclick="document.getElementById('risk-detail').style.display='none'">&#10005;</button>
+    </div>
+    <div class="detail-body">
+      ${r.riskOwner?`<div class="detail-section"><div class="detail-label">Risk Owner</div><div class="detail-val">${esc(r.riskOwner)}</div></div>`:''}
+      ${r.riskEvent?`<div class="detail-section"><div class="detail-label">Risk Event</div><div class="detail-val">${esc(r.riskEvent)}</div></div>`:''}
+      ${r.riskCause?`<div class="detail-section"><div class="detail-label">Penyebab</div><div class="detail-val">${esc(r.riskCause)}</div></div>`:''}
+      ${r.riskConsequence?`<div class="detail-section"><div class="detail-label">Dampak</div><div class="detail-val">${esc(r.riskConsequence)}</div></div>`:''}
+      ${r.likelihood&&r.impact?`<div class="detail-grid"><div class="detail-section"><div class="detail-label">Likelihood</div><div class="detail-val">${r.likelihood} / 5</div></div><div class="detail-section"><div class="detail-label">Impact</div><div class="detail-val">${r.impact} / 5</div></div></div>`:''}
+      ${apl?`<div class="detail-section"><div class="detail-label">Annual Potential Loss</div><div class="detail-val" style="font-weight:600;color:var(--red-text)">Rp ${apl.toLocaleString('id-ID')}</div></div>`:''}
+      ${histHTML}
+      ${relTemuan.length?`<div class="detail-section"><div class="detail-label">Temuan terkait (${relTemuan.length})</div>${relTemuan.slice(0,3).map(t=>`<div class="list-meta" style="margin:.15rem 0"><span class="badge ${t.rating==='High'?'badge-high':t.rating==='Medium'?'badge-med':'badge-low'}">${t.rating}</span> ${esc(t.judul)}</div>`).join('')}</div>`:''}
+    </div>
+    <div class="detail-actions">
+      <button class="btn-sm btn-primary" onclick="editRisk('${r.id}')">&#9998; Edit / Update Score</button>
+      <button class="btn-sm btn-danger" onclick="delRisk('${r.id}')">Hapus</button>
+    </div>
+  </div>`;
+  el.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+// ═══ Migrasi data risk lama → format baru ═══
+function migrateRisks(){
+  if(!DB.risks)return;
+  let migrated=0;
+  DB.risks.forEach(r=>{
+    if(!r.riskId){
+      const catCode={Operasional:'OPS',Finansial:'FIN','K3':'K3',Kepatuhan:'REG',Aset:'AST',Fraud:'FRD',Vendor:'VND',IT:'ITS'}[r.kategori]||'RSK';
+      const idx=DB.risks.filter(x=>x.riskId&&x.riskId.includes(catCode)).length;
+      r.riskId='RISK-'+catCode+'-'+String(idx+1).padStart(3,'0');
+      migrated++;
+    }
+    if(!r.likelihood){
+      const m={High:4,Critical:5,Medium:3,Low:2};
+      r.likelihood=m[r.level]||3;r.impact=m[r.level]||3;
+      r.riskScore=r.likelihood*r.impact;
+    }
+    if(!r._history)r._history=[];
+    if(!r.riskOwner)r.riskOwner='';
+    if(!r.trend)r.trend='\u2192 Stabil';
+    if(!r.status)r.status='Open';
+  });
+  if(migrated>0){save();addLog('Migrasi Risk',migrated+' risk lama diupgrade ke format RBIA v2');}
+}
+
 </script>
 </body>
 </html>
